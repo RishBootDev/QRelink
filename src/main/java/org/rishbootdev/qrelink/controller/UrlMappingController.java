@@ -1,6 +1,5 @@
 package org.rishbootdev.qrelink.controller;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.rishbootdev.qrelink.dtos.ClickEventDTO;
 import org.rishbootdev.qrelink.dtos.UrlMappingDTO;
