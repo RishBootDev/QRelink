@@ -95,7 +95,6 @@ public class UrlMappingService {
             urlMapping.setClickCount(urlMapping.getClickCount() + 1);
             urlMappingRepository.save(urlMapping);
 
-            // Record Click Event
             ClickEvent clickEvent = new ClickEvent();
             clickEvent.setClickDate(LocalDateTime.now());
             clickEvent.setUrlMapping(urlMapping);
@@ -104,4 +103,8 @@ public class UrlMappingService {
 
         return urlMapping;
     }
+    public UrlMapping getUrl(String shortUrl) {
+        return urlMappingRepository.findByShortUrl(shortUrl);
+    }
+
 }

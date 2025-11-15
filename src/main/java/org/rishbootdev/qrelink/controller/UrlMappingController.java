@@ -1,11 +1,15 @@
 package org.rishbootdev.qrelink.controller;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.rishbootdev.qrelink.dtos.ClickEventDTO;
 import org.rishbootdev.qrelink.dtos.UrlMappingDTO;
+import org.rishbootdev.qrelink.models.UrlMapping;
 import org.rishbootdev.qrelink.models.User;
+import org.rishbootdev.qrelink.service.QrCodeService;
 import org.rishbootdev.qrelink.service.UrlMappingService;
 import org.rishbootdev.qrelink.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +23,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/urls")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UrlMappingController {
-    private UrlMappingService urlMappingService;
-    private UserService userService;
+    private final UrlMappingService urlMappingService;
+    private final UserService userService;
+    private final QrCodeService qrCodeService;
 
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     @PostMapping("/shorten")
     @PreAuthorize("hasRole('USER')")
@@ -70,4 +77,22 @@ public class UrlMappingController {
         Map<LocalDate, Long> totalClicks = urlMappingService.getTotalClicksByUserAndDate(user, start, end);
         return ResponseEntity.ok(totalClicks);
     }
+
+    @GetMapping("/qr/{shortUrl}")
+    public ResponseEntity<byte[]> getQrCode(@PathVariable String shortUrl) throws Exception {
+
+        UrlMapping urlMapping = urlMappingService.getUrl(shortUrl);
+
+        if (urlMapping == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String fullUrl = baseUrl + "/" + urlMapping.getShortUrl();
+        byte[] qr = qrCodeService.generateQrCode(fullUrl, 300, 300);
+        return ResponseEntity.ok()
+                .header("Content-Type", "image/png")
+                .body(qr);
+    }
+
+
 }
