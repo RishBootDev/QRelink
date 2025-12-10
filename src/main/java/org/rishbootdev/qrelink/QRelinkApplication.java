@@ -8,6 +8,7 @@ public class QRelinkApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(QRelinkApplication.class, args);
+
     }
 
 }
